@@ -1,4 +1,4 @@
-# <span style="color:blue">Image Classifier</span>
+# <span style="color:blue">Image Classifier 🖼</span>
 
 This project implements a convolutional neural network (CNN) to classify images of cats and dogs. The model is trained on the Kaggle Cats vs Dogs dataset.
 
