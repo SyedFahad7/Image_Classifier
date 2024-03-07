@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from keras import Sequential
-from keras.layers import Dense,Conv2D,MaxPooling2D,Flatten
+from keras.layers import Dense, Conv2D, MaxPooling2D, Flatten
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 sys.stderr.reconfigure(encoding='utf-8')
@@ -18,13 +18,13 @@ train_data_dir = r'C:\Users\Admin\Desktop\BharatIntern\Project 2\kagglecatsanddo
 # Define image dimensions
 img_width, img_height = 150, 150
 
-def load_and_preprocess_data(data_dir):
+def load_and_preprocess_data(data_dir, num_samples=None):
     images = []
     labels = []
 
     for label, category in enumerate(['Cat', 'Dog']):
         category_dir = os.path.join(data_dir, category)
-        for img_name in os.listdir(category_dir):
+        for img_name in os.listdir(category_dir)[:num_samples]:
             img_path = os.path.join(category_dir, img_name)
             img = cv2.imread(img_path)
             if img is None:
@@ -37,8 +37,8 @@ def load_and_preprocess_data(data_dir):
     return np.array(images), np.array(labels)
 
 
-# Load and preprocess the training data
-train_images, train_labels = load_and_preprocess_data(train_data_dir)
+# Load and preprocess the training data (limiting the number of samples to avoid memory error)
+train_images, train_labels = load_and_preprocess_data(train_data_dir, num_samples=1000)
 
 # Display some statistics
 print("Number of training images:", len(train_images))
@@ -78,7 +78,9 @@ print("Training Accuracy:", train_accuracy)
 model.save("my_cnn_model.keras")
 print("Model saved as my_cnn_model.keras")
 
-#Lets TEST our Model
+
+
+# Lets TEST our Model
 import os
 import cv2
 import numpy as np
@@ -156,14 +158,24 @@ print(f"{Fore.YELLOW}Test Accuracy:", test_accuracy)
 # Plotting predictions
 predicted_classes = [class_names[int(np.round(predictions[0]))] for predictions in model.predict(test_images)]
 
+# Display first 5 images with predicted output
+plt.figure(figsize=(15, 8))
+for i in range(5):
+    plt.subplot(1, 5, i + 1)
+    plt.imshow(test_images[i])
+    plt.title(f'Predicted: {predicted_classes[i]}')
+    plt.axis('off')
+plt.show()
+
 # Bar plot
 plt.figure(figsize=(10, 6))
-plt.bar(class_names, [predicted_classes.count(cls) for cls in class_names], color='skyblue', edgecolor='black')
+plt.bar(class_names, [predicted_classes.count(cls) for cls in class_names], color='skyblue', edgecolor='black', linewidth=2)
 plt.title('Predicted Classes Distribution (Bar Plot)')
 plt.xlabel('Class')
 plt.ylabel('Count')
 plt.xticks(rotation=45)
 plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.savefig('bar_plot.png')
 plt.show()
 
 # Pie chart
@@ -171,14 +183,16 @@ plt.figure(figsize=(8, 8))
 plt.pie([predicted_classes.count(cls) for cls in class_names], labels=class_names, autopct='%1.1f%%', startangle=140)
 plt.title('Predicted Classes Distribution (Pie Chart)')
 plt.axis('equal')
+plt.savefig('pie_chart.png')
 plt.show()
 
 # Histogram
 plt.figure(figsize=(10, 6))
-plt.hist(predicted_classes, bins=len(class_names), color='skyblue', edgecolor='black')
+plt.hist(predicted_classes, bins=len(class_names), color='skyblue', edgecolor='black', linewidth=2)
 plt.title('Predicted Classes Distribution (Histogram)')
 plt.xlabel('Class')
 plt.ylabel('Count')
 plt.xticks(rotation=45)
 plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.savefig('.png')
 plt.show()
