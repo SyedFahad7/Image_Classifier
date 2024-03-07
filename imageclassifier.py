@@ -6,16 +6,17 @@ from tensorflow import keras
 from keras import Sequential
 from keras.layers import Dense, Conv2D, MaxPooling2D, Flatten
 import sys
+
 sys.stdout.reconfigure(encoding='utf-8')
 sys.stderr.reconfigure(encoding='utf-8')
 
 np.random.seed(42)
 tf.random.set_seed(42)
 
-# Define the original data directory
+#original data directory
 train_data_dir = r'C:\Users\Admin\Desktop\BharatIntern\Project 2\kagglecatsanddogs_3367a\Petimages'
 
-# Define image dimensions
+#image dimensions
 img_width, img_height = 150, 150
 
 def load_and_preprocess_data(data_dir, num_samples=None):
@@ -30,22 +31,22 @@ def load_and_preprocess_data(data_dir, num_samples=None):
             if img is None:
                 continue
             img = cv2.resize(img, (img_width, img_height))
-            img = img / 255.0  # Normalize pixel values to range [0, 1]
+            img = img / 255.0  # Normalize pixel values to range [0, 1]..
             images.append(img)
             labels.append(label)
 
     return np.array(images), np.array(labels)
 
 
-# Load and preprocess the training data (limiting the number of samples to avoid memory error)
+# Load and preprocess the training data (limiting the number of samples to avoid memory error in my case)
 train_images, train_labels = load_and_preprocess_data(train_data_dir, num_samples=1000)
 
-# Display some statistics
+# Displaying some statistics
 print("Number of training images:", len(train_images))
 print("Number of cat images:", np.sum(train_labels == 0))
 print("Number of dog images:", np.sum(train_labels == 1))
 
-# Define the CNN model
+#CNN model
 model = Sequential(name="my_cnn_model")
 model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(img_width, img_height, 3)))
 model.add(MaxPooling2D((2, 2)))
@@ -57,7 +58,7 @@ model.add(Flatten())
 model.add(Dense(64, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))  # Binary classification, so using sigmoid activation
 
-# Compile the model
+#Compile the model
 model.compile(optimizer='adam',
               loss='binary_crossentropy',  # Since it's a binary classification problem
               metrics=['accuracy'])
@@ -65,22 +66,22 @@ model.compile(optimizer='adam',
 # Display the model summary
 model.summary()
 
-# Train the model
+#Train the model
 history = model.fit(train_images, train_labels, epochs=10, batch_size=32, validation_split=0.2)
 
-# Evaluate the model on the training data
+#Evaluating my model on the training data
 train_loss, train_accuracy = model.evaluate(train_images, train_labels)
 
 print("Training Loss:", train_loss)
 print("Training Accuracy:", train_accuracy)
 
-# Saving the model in the Keras format
+# Saving model in the Keras format
 model.save("my_cnn_model.keras")
 print("Model saved as my_cnn_model.keras")
 
 
 
-# Lets TEST our Model
+# Lets TEST our Model 
 import os
 import cv2
 import numpy as np
@@ -111,22 +112,21 @@ def load_and_preprocess_data(data_dir):
 
     return np.array(images), np.array(labels)
 
-# Define image dimensions
 img_width, img_height = 150, 150
 
-# Path to the folder containing the test images
+#Path to the folder containing the test images..
 test_dir = r"C:\Users\Admin\Desktop\BharatIntern\Project 2\kagglecatsanddogs_3367a\Petimages\Test_data"
 
-# Load the saved model
+#Load the saved model
 model = load_model("my_cnn_model.keras")
 
-# Get the list of class names (folder names)
+#Get the list of class names (folder names)
 class_names = sorted(os.listdir(test_dir))
 
-# Initialize lists to store prediction results
+#Initialize lists to store prediction results
 predictions_table = []
 
-# Loop through each image in the test directory
+#Loop through each image in the test directory
 for class_name in class_names:
     class_dir = os.path.join(test_dir, class_name)
     for img_file in os.listdir(class_dir):
@@ -138,14 +138,14 @@ for class_name in class_names:
         img = img / 255.0  # Normalize pixel values to range [0, 1]
         img = np.expand_dims(img, axis=0)  # Add batch dimension
         
-        # Make predictions without verbose output
+        #Make predictions without verbose output
         predictions = model.predict(img, verbose=0)
         predicted_class = class_names[int(np.round(predictions[0]))]  # Use int(np.round(predictions[0])) to get the predicted class index
         
-        # Store prediction results
+        #Store prediction results
         predictions_table.append([img_file, predicted_class])
 
-# Print predictions table with color
+# Print predictions (table with color using tabulate
 headers = [Fore.BLUE + "Image Name", Fore.GREEN + "Predicted Class"]
 print(tabulate([(Fore.BLUE + row[0], Fore.GREEN + row[1]) for row in predictions_table], headers=headers, tablefmt="fancy_grid", numalign="center"))
 
@@ -155,10 +155,10 @@ test_loss, test_accuracy = model.evaluate(test_images, test_labels, verbose=0)
 print(f"{Fore.YELLOW}Test Loss:", test_loss)
 print(f"{Fore.YELLOW}Test Accuracy:", test_accuracy)
 
-# Plotting predictions
+#Plotting predictions
 predicted_classes = [class_names[int(np.round(predictions[0]))] for predictions in model.predict(test_images)]
 
-# Display first 5 images with predicted output
+#Display first 5 images with predicted output
 plt.figure(figsize=(15, 8))
 for i in range(5):
     plt.subplot(1, 5, i + 1)
@@ -167,7 +167,7 @@ for i in range(5):
     plt.axis('off')
 plt.show()
 
-# Bar plot
+# a Bar plot
 plt.figure(figsize=(10, 6))
 plt.bar(class_names, [predicted_classes.count(cls) for cls in class_names], color='skyblue', edgecolor='black', linewidth=2)
 plt.title('Predicted Classes Distribution (Bar Plot)')
@@ -178,7 +178,7 @@ plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.savefig('bar_plot.png')
 plt.show()
 
-# Pie chart
+#Pie chart
 plt.figure(figsize=(8, 8))
 plt.pie([predicted_classes.count(cls) for cls in class_names], labels=class_names, autopct='%1.1f%%', startangle=140)
 plt.title('Predicted Classes Distribution (Pie Chart)')
@@ -186,7 +186,7 @@ plt.axis('equal')
 plt.savefig('pie_chart.png')
 plt.show()
 
-# Histogram
+#Histogram
 plt.figure(figsize=(10, 6))
 plt.hist(predicted_classes, bins=len(class_names), color='skyblue', edgecolor='black', linewidth=2)
 plt.title('Predicted Classes Distribution (Histogram)')
